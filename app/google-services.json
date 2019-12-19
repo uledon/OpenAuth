@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "361233548860",
+    "firebase_url": "https://openauth-32128.firebaseio.com",
+    "project_id": "openauth-32128",
+    "storage_bucket": "openauth-32128.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:361233548860:android:406bfb150b90440c18a539",
+        "android_client_info": {
+          "package_name": "com.OpenNAC.openauth"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "361233548860-pvq0nujovvkhpfgmm9uc87h6nroqc6r3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.OpenNAC.openauth",
+            "certificate_hash": "9c16ef2bbf537d219b2e2a7872fd945c31c37dec"
+          }
+        },
+        {
+          "client_id": "361233548860-qkbd7hrgp6gnvgp1niog996769e1p0jp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCudeIDKXDLYMT4spy6zIiDwMff1VJR93I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "361233548860-qkbd7hrgp6gnvgp1niog996769e1p0jp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
