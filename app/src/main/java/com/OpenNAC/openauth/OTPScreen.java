@@ -42,7 +42,7 @@ public class OTPScreen extends AppCompatActivity {
                     e.printStackTrace();
                 }
 
-
+///comment
         otpTxt.setText(code);
         accNameTxt.setText(nameBox);
         Thread t = new Thread(){
