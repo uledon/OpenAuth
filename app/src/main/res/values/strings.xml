@@ -1,3 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OpenAuth</string>
     <string name="welcome_to_opennac_authentication_service">Welcome to OpenNAC Authentication Service</string>
@@ -6,7 +7,7 @@
     <string name="back">Back</string>
     <string name="visit_our_website">Visit our website</string>
     <string name="english">English</string>
-    <string name="espa_ol">Español</string>
+    <string name="espa_ol">Spanish</string>
     <string name="verify">Verify</string>
     <string name="send">Send</string>
     <string name="enter_otp_number">Enter OTP Number</string>
@@ -23,7 +24,7 @@
     <string name="action_sign_in_short">Sign in</string>
     <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
-    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="invalid_password">Password must be more than 5 characters</string>
     <string name="login_failed">"Login failed"</string>
     <string name="welcome2">welcome</string>
     <string name="button">Button</string>
@@ -35,8 +36,17 @@
     <string name="url">URL</string>
     <string name="username">Username</string>
     <string name="log_in">Log in</string>
-    <string name="local_user_only">Local User Only</string>
     <string name="remember_me">Remember me</string>
-    <string name = "biometric_failed">Fingerprint not recognized</string>
-    <string name="opencloudfactorylogo">opencloudfactorylogo</string>
+    <string name="biometric_failed">Fingerprint not recognized</string>
+    <string name= "waiting_for_auth">Waiting for authentication...</string>
+    <string name= "no_registered_details">No registered details</string>
+    <string name= "press_back_again">Press again to exit</string>
+    <string name= "url_invalid">URL is not valid</string>
+    <string name= "username_required">Username is required</string>
+    <string name= "password_required">Password is required</string>
+    <string name= "need_permission">Need permission</string>
+    <string name= "success">Success !</string>
+    <string name= "not_recognized">not recognized</string>
+    <string name= "no_fingerprint">No fingerprint saved</string>
+    <string name= "no_finger_reader">No fingerprint reader detected</string>
 </resources>

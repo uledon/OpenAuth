@@ -7,7 +7,7 @@
     tools:context=".LoginActivity">
 
     <TextView
-        android:id="@+id/textView4"
+        android:id="@+id/passTxt"
         android:layout_width="116dp"
         android:layout_height="48dp"
         android:text="@string/password"

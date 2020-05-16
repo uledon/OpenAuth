@@ -12,16 +12,15 @@ import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.OpenNAC.openauth.Services.Post;
+import com.OpenNAC.openauth.Services.UserService;
 import com.OpenNAC.openauth.remote.EncryptionUtils;
-import com.OpenNAC.openauth.remote.Post;
-import com.OpenNAC.openauth.remote.UserService;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -29,6 +28,11 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import okhttp3.Headers;
+import okhttp3.MultipartBody;
+import okhttp3.OkHttpClient;
+import okhttp3.RequestBody;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -42,15 +46,15 @@ public class LoginActivity extends AppCompatActivity {
     // The following Strings are used by SharedPreferences
     // They are used so differentiate the different stored values
     private static final String SHARED_PREFS = "sharedPrefs", URL_TEXT = "urlBox",
-            USERNAME_TEXT = "edtusername", PASSWORD_TEXT = "edtpassword", SWITCH1 = "switch1";
+            USERNAME_TEXT = "edtusername", PASSWORD_TEXT = "edtpassword", SWITCH1 = "switch1", useragent = "Mozilla/5.0";
 
     Button btnLogin; // This is the button user clicks to log in
-    private TextView result; // Used to view if various actions are successful or not
+    private TextView result, passTxt; // Used to view if various actions are successful or not
     private String url, urlText, usernameText, passwordText; // variables used to store data from fields
     private EditText urlBox, edtUsername, edtPassword; // These are the fields where user enters data
-    private Switch localUserSwitch; // Switch used to set if user is local or not
     private CheckBox rememberMeBox; // check box to remember details
     private boolean switchOnOff; // variable to store boolean value of rememberMeBox CheckBox variable
+    protected static boolean loggedin,spanish;
     ///
     private FingerprintManager fingerprintManager; // This is used to initialise the fingerprint Manager
 
@@ -62,78 +66,75 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
+        //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
         result = findViewById(R.id.result);
-
+        spanish = getIntent().getBooleanExtra("spanishset",false);
         edtUsername = findViewById(R.id.usernameBox);
         edtPassword = findViewById(R.id.passwordBox);
         urlBox = findViewById(R.id.URLBox);
-        localUserSwitch = findViewById(R.id.localUserSwitch);
         rememberMeBox = findViewById(R.id.rememberMeBox);
         btnLogin = findViewById(R.id.loginBtn);
+        passTxt = findViewById(R.id.passTxt);
+//        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
+//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
+//        System.out.println( "ssid in login screen is " + DataClass.getSsid(wifiInfo) + "\n");
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+
+//        if (spanish){
+//            urlBox.setHint("Ingrese la URL aquí");
+//            edtUsername.setHint("Ingrese su Nombre");
+//            passTxt.setText("Contraseña");
+//            edtPassword.setHint("Ingerese su contraseña");
+//            btnLogin.setText("Entrar");
+//            rememberMeBox.setText("Recuérdame");
+//        }
+
         enableFingerprint();
         btnLogin.setOnClickListener(v -> {
             url = urlBox.getText().toString();
             if (!urlBox.getText().toString().endsWith("/")) {
                 url = urlBox.getText().toString() + "/";
             }
-            System.out.println("url is:" + url);
+            editor.putString(URL_TEXT, EncryptionUtils.encrypt(LoginActivity.this,urlBox.getText().toString()));
+            editor.apply();
             String username = edtUsername.getText().toString();
             String password = edtPassword.getText().toString();
             try {
-                createPost(url, username, password, localUserSwitch.isChecked(), v);
+                createPost(url, username, password, v);
                 //localUserSwitch.resetPivot();
             } catch (IllegalArgumentException ex) {
-                System.out.println(ex.getMessage());
+                System.out.println("catch is wrong" + ex.getMessage());
             }
-
         });
     }
 
-    @RequiresApi(api = Build.VERSION_CODES.M)
-    private void enableFingerprint(){
-        ///// Fingerprint enabling start /////
-        fingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
-        Dexter.withActivity(this).withPermission(Manifest.permission.USE_FINGERPRINT).withListener(
-                new PermissionListener() {
-                    @Override
-                    public void onPermissionGranted(PermissionGrantedResponse response) {
-                        setStatus("Waiting for authentication...");
-                        auth();
-                    }
-
-                    @Override
-                    public void onPermissionDenied(PermissionDeniedResponse response) {
-                        setStatus("Need permission");
-                    }
-
-                    @Override
-                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
-                        token.continuePermissionRequest();
-                    }
-                }).check();
-        ///// Fingerprint enabling end /////
-    }
     /**
      * This method will be called when the login button is clicked
      *
      * @param url              gets the url from the form
      * @param username         gets the username from the form
      * @param password         gets the password from the form
-     * @param useOnlyLocalRepo gets the boolean useOnlyLocalRepo
      * @param view             gets the view to change.
      */
-    public void createPost(String url, String username, String password, boolean useOnlyLocalRepo, View view) {
-
-        //Creating a retrofit instance to work on as this library is very easy to use.
+    public void createPost(String url, String username, String password, View view) {
+        HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor();
+        loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .addInterceptor(loggingInterceptor)
+                .build();
         if (validateLogin(url, username, password)) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
+                    .client(okHttpClient)
                     .build();
             UserService api = retrofit.create(UserService.class);
-            Post post = new Post(username, password, useOnlyLocalRepo);
-            Call<Post> call = api.createPost(post);
+        RequestBody usernamePart = RequestBody.create(MultipartBody.FORM, username);
+        RequestBody passwordPart = RequestBody.create(MultipartBody.FORM, password);
+
+            Call<Post> call = api.createPost(useragent,usernamePart,passwordPart);
             //call.enqueue is an asynchronous call without slowing main thread
             call.enqueue(new Callback<Post>() {
                 @Override
@@ -142,22 +143,36 @@ public class LoginActivity extends AppCompatActivity {
                         result.setText("Code:" + response.code());
                         return;
                     }
+
                     Post postResponse = response.body();
+                    Headers headers = response.headers();
+                    String cookie = response.headers().get("Set-Cookie");
                     String content = "";
                     content += "result: " + postResponse.getResult() + "\n";
-                    content += "token: " + postResponse.getToken();
-                    //content += "mac: " + postResponse.getMac();
+                    content += "token: " + postResponse.getToken() + "\n";
+                    content += "mail: " + postResponse.getMail();
                     result.setText(content);
+
+                    SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString("cookie", EncryptionUtils.encrypt(LoginActivity.this,cookie));
+
+                    editor.apply();
+                    Intent myIntent = new Intent(view.getContext(), VerifyScreen.class);
+                    myIntent.putExtra("baseURL",url);
+                    myIntent.putExtra("username", username );
+                    myIntent.putExtra("token", postResponse.getToken());
+                    myIntent.putExtra("spanishset",spanish);
                     if (rememberMeBox.isChecked()) {
-                        saveData();
+                    myIntent.putExtra("logged",true);
                     }
-                    Intent myIntent = new Intent(view.getContext(), SharedKeyScreen.class);
                     startActivityForResult(myIntent, 0);
+                    finish();
                 }
 
                 @Override
                 public void onFailure(Call<Post> call, Throwable t) {
-                    result.setText(t.getMessage());
+                    result.setText("on failure " + t.getMessage());
                 }
             });
         }
@@ -165,7 +180,7 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * This following method will make sure the fields below are not empty
-     *
+     *1
      * @param url,
      * @param password
      * @param, username,
@@ -186,40 +201,59 @@ public class LoginActivity extends AppCompatActivity {
         return true;
     }
 
-    public void saveData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(URL_TEXT, EncryptionUtils.encrypt(LoginActivity.this,urlBox.getText().toString()));
-        editor.putString(USERNAME_TEXT, EncryptionUtils.encrypt(LoginActivity.this,edtUsername.getText().toString()));
-//        String encryptedValue = EncryptionUtils.encrypt(LoginActivity.this,
-//                edtPassword.getText().toString());
-        editor.putString(PASSWORD_TEXT, EncryptionUtils.encrypt(LoginActivity.this,
-                edtPassword.getText().toString()));
-        editor.putBoolean(SWITCH1, localUserSwitch.isChecked());
-        editor.apply();
-        Toast.makeText(this, "Data saved", Toast.LENGTH_SHORT).show();
-    }
 
     public void loadData() {
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
         urlText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(URL_TEXT, ""));
         usernameText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(USERNAME_TEXT, ""));
-//        System.out.println("load data is: "+sharedPreferences.getString(USERNAME_TEXT,""));
         passwordText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(PASSWORD_TEXT, ""));
-
-//        passwordText = EncryptionUtils.decrypt(this,sharedPreferences.getString(PASSWORD_TEXT,""));
         switchOnOff = sharedPreferences.getBoolean(SWITCH1, false);
-//        System.out.println("the passwordText is: " + passwordText);
     }
 
     public void updateViews() {
         urlBox.setText(urlText);
         edtUsername.setText(usernameText);
         edtPassword.setText(passwordText);
-        localUserSwitch.setChecked(switchOnOff);
         System.out.println("update data is: " + usernameText);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void enableFingerprint(){
+        ///// Fingerprint enabling start /////
+        fingerprintManager = (FingerprintManager) getSystemService(Context.FINGERPRINT_SERVICE);
+        Dexter.withActivity(this).withPermission(Manifest.permission.USE_FINGERPRINT).withListener(
+                new PermissionListener() {
+                    @Override
+                    public void onPermissionGranted(PermissionGrantedResponse response) {
+                        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+                        loggedin = sharedPreferences.getBoolean("logged",false);
+                        if(loggedin) {
+
+                                setStatus(getString(R.string.waiting_for_auth));
+                            auth();
+                        }
+                        else{
+                            setStatus(getString(R.string.no_registered_details));
+                        }
+
+                    }
+
+                    @Override
+                    public void onPermissionDenied(PermissionDeniedResponse response) {
+
+                            setStatus("Necesita permiso");
+
+                            setStatus("Need permission");
+
+                    }
+
+                    @Override
+                    public void onPermissionRationaleShouldBeShown(PermissionRequest permission, PermissionToken token) {
+                        token.continuePermissionRequest();
+                    }
+                }).check();
+        ///// Fingerprint enabling end /////
+    }
     //this method is used to authenticate the fingerprint. It will run some checks before hand and
     //make sure that there is a method to authenticate with fingerprint.
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -243,10 +277,7 @@ public class LoginActivity extends AppCompatActivity {
                     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
                         setStatus("Success !");
-                        runOnUiThread(() -> loadData());
-                        runOnUiThread(() -> updateViews());
-                        runOnUiThread(() -> btnLogin.performClick());
-                        runOnUiThread(() -> logIn());
+                        runOnUiThread(() -> setScreen());
                     }
 
                     @Override
@@ -262,8 +293,11 @@ public class LoginActivity extends AppCompatActivity {
             setStatus("No fingerprint reader detected");
         }
     }
-    private void logIn(){
 
+    private void setScreen(){
+        Intent intent = new Intent(this, OTPScreen.class);
+        startActivity(intent);
+        finish();
     }
     private void setStatus(final String message) {
         runOnUiThread(() -> result.setText(message));
