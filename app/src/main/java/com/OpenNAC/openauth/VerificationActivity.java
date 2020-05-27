@@ -27,7 +27,7 @@ import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
-public class VerifyScreen extends AppCompatActivity {
+public class VerificationActivity extends AppCompatActivity {
     EditText codeBox;
     Button verifyButton;
     String mac, factor, fcmt, vendor, os, version, ip_addr, model, security_patch, hostname,
@@ -37,9 +37,9 @@ public class VerifyScreen extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-        setContentView(R.layout.activity_verify_screen);
+        setContentView(R.layout.activity_verification);
         codeBox = findViewById(R.id.codeBox);
-        verifyButton = findViewById(R.id.verifyButton);
+        verifyButton = findViewById(R.id.verifyBtn);
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         mac = DataClass.getMacAddr();
@@ -81,8 +81,8 @@ public class VerifyScreen extends AppCompatActivity {
                 .addInterceptor(loggingInterceptor)
                 .build();
         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        String urlText = EncryptionUtils.decrypt(VerifyScreen.this, sharedPreferences.getString(URL_TEXT, ""));
-        String cookie = EncryptionUtils.decrypt(VerifyScreen.this, sharedPreferences.getString("cookie", ""));
+        String urlText = EncryptionUtils.decrypt(VerificationActivity.this, sharedPreferences.getString(URL_TEXT, ""));
+        String cookie = EncryptionUtils.decrypt(VerificationActivity.this, sharedPreferences.getString("cookie", ""));
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl(urlText)
                 .addConverterFactory(GsonConverterFactory.create())
@@ -110,7 +110,7 @@ public class VerifyScreen extends AppCompatActivity {
             public void onResponse(Call<User> call, Response<User> response) {
 
                 if (!response.isSuccessful()) {
-                   Toast.makeText(VerifyScreen.super.getBaseContext(), "" + response.code() +
+                   Toast.makeText(VerificationActivity.super.getBaseContext(), "" + response.code() +
                            " " + response.message() + " " + response.body(), Toast.LENGTH_SHORT).show();
                     editor.putBoolean("logged", false);
                     editor.apply();
@@ -119,18 +119,18 @@ public class VerifyScreen extends AppCompatActivity {
                 }
                 User postResponse = response.body();
 
-                editor.putString("account", EncryptionUtils.encrypt(VerifyScreen.this,postResponse.getAccount()));
-                editor.putString("secret", EncryptionUtils.encrypt(VerifyScreen.this,postResponse.getSecret()));
+                editor.putString("account", EncryptionUtils.encrypt(VerificationActivity.this,postResponse.getAccount()));
+                editor.putString("secret", EncryptionUtils.encrypt(VerificationActivity.this,postResponse.getSecret()));
                 if(getIntent().getBooleanExtra("logged", false)) {
                     editor.putBoolean("logged", true);
                 }
                 editor.apply();
                 if (postResponse.getSecret()== null){
-                    Toast.makeText(VerifyScreen.this, "Response from server is invalid", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(VerificationActivity.this, "Response from server is invalid", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                Intent myIntent = new Intent(view.getContext(), OTPScreen.class);
+                Intent myIntent = new Intent(view.getContext(), OTPActivity.class);
                 startActivityForResult(myIntent, 0);
                 finish();
             }
@@ -140,7 +140,7 @@ public class VerifyScreen extends AppCompatActivity {
                 //result.setText(t.getMessage());
                 editor.putBoolean("logged", false);
                 editor.apply();
-                Toast.makeText(VerifyScreen.super.getBaseContext(), "" + t.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(VerificationActivity.super.getBaseContext(), "" + t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

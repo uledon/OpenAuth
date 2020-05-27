@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OpenAuth</string>
-    <string name="welcome_to_opennac_authentication_service">Bem-vindo ao serviço de autenticação OpenNAC</string>
-    <string name="click_here_to_begin">Clique aqui para começar</string>
+    <string name="welcome">Bem-vindo</string>
+    <string name="connect">conectar</string>
     <string name="go_back">Volte</string>
     <string name="back">De volta</string>
     <string name="visit_our_website">Visite o nosso site</string>
     <string name="english">Inglês</string>
-    <string name="espa_ol">Espanhol</string>
+    <string name="spanish">Espanhol</string>
+    <string name="portuguese">Português</string>
     <string name="verify">Verificar</string>
     <string name="send">Enviar</string>
     <string name="enter_otp_number">Digite o número OTP</string>
@@ -22,7 +23,6 @@
     <string name="prompt_password">Senha</string>
     <string name="action_sign_in">Entrar ou Registrar</string>
     <string name="action_sign_in_short">assinar em</string>
-    <string name="welcome">"Bem-vinda !"</string>
     <string name="invalid_username">Não é um nome de usuário válido</string>
     <string name="invalid_password">A senha deve ter mais que caracteres</string>
     <string name="login_failed">"Falha na autenticação"</string>
@@ -49,4 +49,12 @@
     <string name= "not_recognized">Não reconhecido</string>
     <string name= "no_fingerprint">Nenhuma impressão digital salva</string>
     <string name= "no_finger_reader">Nenhum leitor de impressão digital detectado</string>
+    <string name="disconnect">Desconectar</string>
+    <string name="server">Servidor</string>
+    <string name="onboarding">Nome de integração</string>
+    <string name="version">Versão</string>
+    <string name="account">Conta</string>
+    <string name="language">Língua</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

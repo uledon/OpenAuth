@@ -12,7 +12,6 @@ import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -49,7 +48,7 @@ public class LoginActivity extends AppCompatActivity {
             USERNAME_TEXT = "edtusername", PASSWORD_TEXT = "edtpassword", SWITCH1 = "switch1", useragent = "Mozilla/5.0";
 
     Button btnLogin; // This is the button user clicks to log in
-    private TextView result, passTxt; // Used to view if various actions are successful or not
+    //private TextView passTxt; // Used to view if various actions are successful or not
     private String url, urlText, usernameText, passwordText; // variables used to store data from fields
     private EditText urlBox, edtUsername, edtPassword; // These are the fields where user enters data
     private CheckBox rememberMeBox; // check box to remember details
@@ -68,14 +67,14 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
-        result = findViewById(R.id.result);
+        //result = findViewById(R.id.result);
         spanish = getIntent().getBooleanExtra("spanishset",false);
         edtUsername = findViewById(R.id.usernameBox);
         edtPassword = findViewById(R.id.passwordBox);
         urlBox = findViewById(R.id.URLBox);
         rememberMeBox = findViewById(R.id.rememberMeBox);
         btnLogin = findViewById(R.id.loginBtn);
-        passTxt = findViewById(R.id.passTxt);
+//        passTxt = findViewById(R.id.passTxt);
 //        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
 //        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
 //        System.out.println( "ssid in login screen is " + DataClass.getSsid(wifiInfo) + "\n");
@@ -140,7 +139,8 @@ public class LoginActivity extends AppCompatActivity {
                 @Override
                 public void onResponse(Call<Post> call, Response<Post> response) {
                     if (!response.isSuccessful()) {
-                        result.setText("Code:" + response.code());
+                        //result.setText("Code:" + response.code());
+                        System.out.println("Code: " + response.code());
                         return;
                     }
 
@@ -151,14 +151,15 @@ public class LoginActivity extends AppCompatActivity {
                     content += "result: " + postResponse.getResult() + "\n";
                     content += "token: " + postResponse.getToken() + "\n";
                     content += "mail: " + postResponse.getMail();
-                    result.setText(content);
+                    //result.setText(content);
+                    System.out.println(content);
 
                     SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("cookie", EncryptionUtils.encrypt(LoginActivity.this,cookie));
 
                     editor.apply();
-                    Intent myIntent = new Intent(view.getContext(), VerifyScreen.class);
+                    Intent myIntent = new Intent(view.getContext(), VerificationActivity.class);
                     myIntent.putExtra("baseURL",url);
                     myIntent.putExtra("username", username );
                     myIntent.putExtra("token", postResponse.getToken());
@@ -172,7 +173,8 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onFailure(Call<Post> call, Throwable t) {
-                    result.setText("on failure " + t.getMessage());
+                    //result.setText("on failure " + t.getMessage());
+                    System.out.println("on failure " + t.getMessage());
                 }
             });
         }
@@ -295,12 +297,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void setScreen(){
-        Intent intent = new Intent(this, OTPScreen.class);
+        Intent intent = new Intent(this, OTPActivity.class);
         startActivity(intent);
         finish();
     }
     private void setStatus(final String message) {
-        runOnUiThread(() -> result.setText(message));
+        runOnUiThread(() -> System.out.println(message));
     }
 
 }

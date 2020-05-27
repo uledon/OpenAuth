@@ -62,7 +62,6 @@ public class DataClass {
         String tkn = FirebaseInstanceId.getInstance().getToken();
         return tkn;
     }
-
     public static String getVendor(){
         return Build.MANUFACTURER;
     }

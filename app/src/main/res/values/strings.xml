@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">OpenAuth</string>
-    <string name="welcome_to_opennac_authentication_service">Welcome to OpenNAC Authentication Service</string>
-    <string name="click_here_to_begin">Click here to begin</string>
+    <string name="welcome">Welcome</string>
+    <string name="connect">Connect</string>
     <string name="go_back">Go back</string>
     <string name="back">Back</string>
     <string name="visit_our_website">Visit our website</string>
     <string name="english">English</string>
-    <string name="espa_ol">Spanish</string>
+    <string name="spanish">Spanish</string>
+    <string name="portuguese">Portuguese</string>
     <string name="verify">Verify</string>
     <string name="send">Send</string>
     <string name="enter_otp_number">Enter OTP Number</string>
@@ -22,7 +23,6 @@
     <string name="prompt_password">Password</string>
     <string name="action_sign_in">Sign in or register</string>
     <string name="action_sign_in_short">Sign in</string>
-    <string name="welcome">"Welcome !"</string>
     <string name="invalid_username">Not a valid username</string>
     <string name="invalid_password">Password must be more than 5 characters</string>
     <string name="login_failed">"Login failed"</string>
@@ -49,4 +49,12 @@
     <string name= "not_recognized">not recognized</string>
     <string name= "no_fingerprint">No fingerprint saved</string>
     <string name= "no_finger_reader">No fingerprint reader detected</string>
+    <string name="disconnect">Disconnect</string>
+    <string name="server">Server</string>
+    <string name="onboarding">Onboarding Name</string>
+    <string name="version">Version</string>
+    <string name="account">Account</string>
+    <string name="language">Language</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
 </resources>

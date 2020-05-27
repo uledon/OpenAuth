@@ -14,33 +14,65 @@ import android.net.wifi.WifiManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
-import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBarDrawerToggle;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 
 import com.OpenNAC.openauth.Services.DataClass;
+import com.google.android.material.navigation.NavigationView;
 
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     private static final String ENGLISH_LANG = "en", SPANISH_LANG = "es", PORTOGUESE_LANG = "pt";
     private static final String info = "https://www.opencloudfactory.com/en/";
-    private Button infoBtn;
+    private Button infoBtn,beginBtn,helpBtn;
     private long backPressedTime;
     private Toast backToast;
-
-    ///maybe need to have a better way of handling languages
+    TextView welcomeText;
+    ImageView splash_background,app_logo, appLogoLight;
+    Animation topAnim,iconAnim,fadeAnim,logoAnim;
+    DrawerLayout drawerLayout;
+    NavigationView navigationView;
+    Toolbar toolbar;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //System.out.println("after main tkn = " + DataClass.getFirebaseToken());
-        Button beginButton = findViewById(R.id.beginButton);
+        splash_background = findViewById(R.id.bigBack2);
+        app_logo= findViewById(R.id.appLogo);
+        infoBtn = findViewById(R.id.infoBtn);
+        beginBtn = findViewById(R.id.beginButton);
+        helpBtn = findViewById(R.id.helpBtn);
+        welcomeText = findViewById(R.id.welcomeText);
+        //toolbar
+        drawerLayout = findViewById(R.id.drawer_layout);
+        navigationView = findViewById(R.id.nav_view);
+        toolbar =  findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
+        navigationView.bringToFront();
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this,drawerLayout,toolbar,R.string.navigation_drawer_open,R.string.navigation_drawer_close);
+        drawerLayout.addDrawerListener(toggle);
+        toggle.syncState();
+        navigationView.setNavigationItemSelectedListener(this);
+        //toolbar
+        topAnim = AnimationUtils.loadAnimation(this, R.anim.top_animation);
+        iconAnim = AnimationUtils.loadAnimation(this, R.anim.icon_anim);
+        logoAnim = AnimationUtils.loadAnimation(this,R.anim.logo_anim);
+        executeAnimations();
         WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
         WifiInfo wifiInfo = wifiManager.getConnectionInfo();
         System.out.println("dataclass ip is " + DataClass.getIp(wifiInfo) + "\n"
@@ -50,9 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 + " actual mac " + DataClass.getMacAddr());
         getLocation(); /// get location
         System.out.println("time in main is " + DataClass.getTimeStamp());
-        infoBtn = findViewById(R.id.infoBtn);
-        ImageButton spanishBtn = findViewById(R.id.spanishlang), englishBtn = findViewById(R.id.englang);
-        beginButton.setOnClickListener((View view) -> {
+        beginBtn.setOnClickListener((View view) -> {
             Intent myIntent = new Intent(view.getContext(), LoginActivity.class);
             startActivityForResult(myIntent, 0);
         });
@@ -64,19 +94,13 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        spanishBtn.setOnClickListener(v -> {
-            setLanguage(SPANISH_LANG);
-        });
-
-        englishBtn.setOnClickListener(v -> {
-            setLanguage(ENGLISH_LANG);
-        });
-
     }
 
     @Override
     public void onBackPressed() {
-
+        if(drawerLayout.isDrawerOpen(GravityCompat.START)){
+            drawerLayout.closeDrawer(GravityCompat.START);
+        }
         if (backPressedTime + 2000 > System.currentTimeMillis()) {
             backToast.cancel();
             super.onBackPressed();
@@ -144,5 +168,25 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
             Toast.makeText(this, "not found", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void executeAnimations(){
+        splash_background.animate().translationY(-1670).setDuration(2300).setStartDelay(300);
+        app_logo.animate().translationYBy(-270).setDuration(2500).setStartDelay(300);
+        //app_logo.setAnimation(logoAnim);
+//        Handler handler = new Handler();
+//        handler.postDelayed(() -> ImageViewCompat.setImageTintList(splash_background, ColorStateList.valueOf(ContextCompat.getColor(getBaseContext(), R.color.colorPrimary))), 3100);
+        infoBtn.startAnimation(iconAnim);
+        beginBtn.startAnimation(iconAnim);
+        helpBtn.startAnimation(iconAnim);
+//        hamburgerBtn.startAnimation(topAnim);
+        welcomeText.startAnimation(topAnim);
+        toolbar.setAnimation(topAnim);
+//        appLogoLight.startAnimation(topAnim);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+        return true;
     }
 }

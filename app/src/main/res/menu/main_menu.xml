@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:title="@string/account"
+        android:textColorPrimary="@color/colorPrimaryDark">
+        <menu>
+            <group android:checkableBehavior="single">
+                <item
+                    android:id="@+id/server"
+                    android:title="@string/server" />
+                <item
+                    android:id="@+id/onboarding"
+                    android:title="@string/onboarding" />
+                <item
+                    android:id="@+id/version"
+                    android:title="@string/version" />
+                <item
+                    android:id="@+id/disconnect"
+                    android:icon="@drawable/disconnect"
+                    android:title="@string/disconnect" />
+            </group>
+        </menu>
+    </item>
+    <item
+        android:title="@string/language">
+        <group android:checkableBehavior="single">
+            <menu>
+                <item
+                    android:id="@+id/english"
+                    android:icon="@drawable/uk_flag"
+                    android:title="@string/english" />
+                <item
+                    android:id="@+id/spanish"
+                    android:icon="@drawable/ic_spain_flag"
+                    android:title="@string/spanish" />
+                <item
+                    android:id="@+id/portuguese"
+                    android:icon="@drawable/ic_portugal_flag"
+                    android:title="@string/portuguese" />
+            </menu>
+        </group>
+    </item>
+
+</menu>
