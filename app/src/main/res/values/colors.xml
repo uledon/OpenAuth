@@ -6,6 +6,9 @@
     <color name= "clickedColor">#0384CE</color>
     <color name="white">#F2F2F2</color>
     <color name="greyback">#EEEEEE</color>
+    <color name="yesColor">#417446</color>
+    <color name="noColor">#C1232C</color>
+    <color name= "colorTransparentWhite">#cccccc</color>
     ////
     <color name= "azure">#24A0ED</color>
 </resources>

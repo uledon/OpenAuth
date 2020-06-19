@@ -57,4 +57,27 @@
     <string name="language">Língua</string>
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="no">Não, negar</string>
+    <string name="yes">Sim, aprovar</string>
+    <string name="enter_key">Digite o código que foi enviado para o seu email</string>
+    <string name="verify_yourself">Verifique-se</string>
+    <string name="enter_your_code">Insira seu código</string>
+    <string name="help">Socorro</string>
+    <string name="connected">Conectado</string>
+    <string name="show_otp">mostre OTP</string>
+    <string name="ip_add">Endereço de IP</string>
+    <string name="location">Localização</string>
+    <string name="time">Tempo</string>
+    <string name="system_text">Sistema</string>
+    <string name="help_screen_one_header">Maior segurança com o OpenAuth</string>
+    <string name="help_screen_one_body">Obtenha códigos de verificação para todas as suas contas usando a verificação em duas etapas</string>
+    <string name="help_screen_two_header">Configuração simples e autenticação biométrica disponíveis</string>
+    <string name="help_screen_two_body">Configure o aplicativo com sua conta e mantenha-o conectado com segurança com impressão digital</string>
+    <string name="help_screen_three_header">Um código exclusivo usado para fazer login</string>
+    <string name="help_screen_three_body">Ao usar a verificação em duas etapas, um código exclusivo desse aplicativo será gerado a cada 30 segundos</string>
+    <string name="finish">Terminar</string>
+    <string name="your_otp_is">"Seu OTP é: "</string>
+    <string name="authenticator_app">Aplicativo autenticador</string>
+    <string name="server_name_copied">Nome do servidor copiado</string>
+    <string name="hide_otp">Esconder otp</string>
 </resources>

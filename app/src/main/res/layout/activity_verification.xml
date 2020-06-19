@@ -9,9 +9,10 @@
 
     <ImageView
         android:id="@+id/topBack5"
-        android:layout_width="413dp"
+        android:layout_width="0dp"
         android:layout_height="227dp"
         android:tint="@color/colorPrimary"
+        android:scaleType="fitXY"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -23,17 +24,15 @@
         android:id="@+id/bottomBack5"
         android:layout_width="374dp"
         android:layout_height="660dp"
-        android:layout_marginStart="25dp"
-        android:layout_marginLeft="25dp"
-        android:layout_marginTop="268dp"
-        android:layout_marginEnd="25dp"
-        android:layout_marginRight="25dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginEnd="10dp"
         android:scaleType="centerCrop"
         android:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.307"
+        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/topBack5"
         app:srcCompat="@drawable/bottomrear" />
 
     <TextView
@@ -73,49 +72,48 @@
         android:id="@+id/textView4"
         android:layout_width="217dp"
         android:layout_height="64dp"
+        android:fontFamily="@font/fira_sans"
         android:gravity="center_horizontal|center_vertical"
         android:scrollHorizontally="false"
-        android:text="Enter the code that was sent to your Email"
+        android:text="@string/enter_key"
         android:textAllCaps="false"
         android:textColor="#090808"
-        android:fontFamily="@font/fira_sans"
         android:textSize="18sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.729" />
+        app:layout_constraintTop_toBottomOf="@+id/textView"
+        app:layout_constraintVertical_bias="0.269" />
 
     <TextView
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Verify yourself"
+        android:fontFamily="@font/fira_sans"
+        android:text="@string/verify_yourself"
         android:textAllCaps="true"
         android:textColor="#090808"
         android:textSize="36sp"
-        android:fontFamily="@font/fira_sans"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.529" />
+        app:layout_constraintTop_toBottomOf="@+id/appLogo5"
+        app:layout_constraintVertical_bias="0.135" />
 
     <EditText
         android:id="@+id/codeBox"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"
-        android:hint="Enter your code"
-        android:inputType="textPersonName"
         android:fontFamily="@font/fira_sans"
+        android:hint="@string/enter_your_code"
+        android:inputType="textPersonName"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.845" />
+        app:layout_constraintTop_toBottomOf="@+id/textView4"
+        app:layout_constraintVertical_bias="0.247" />
 
     <Button
         android:id="@+id/verifyBtn"
@@ -124,14 +122,13 @@
         android:background="@drawable/basicbutton"
         android:backgroundTint="@color/colorPrimary"
         android:fontFamily="@font/fira_sans"
-        android:text="verify"
+        android:text="@string/verify"
         android:textColor="#FFFFFF"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.945" />
+        app:layout_constraintTop_toBottomOf="@+id/codeBox"
+        app:layout_constraintVertical_bias="0.363" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

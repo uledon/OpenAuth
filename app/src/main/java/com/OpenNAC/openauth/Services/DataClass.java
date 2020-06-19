@@ -8,6 +8,7 @@ import android.os.Build;
 import android.provider.Settings;
 import android.text.format.Formatter;
 
+import com.OpenNAC.openauth.R;
 import com.google.firebase.iid.FirebaseInstanceId;
 
 import java.io.IOException;
@@ -114,7 +115,7 @@ public class DataClass {
             if (addresses.size()>0){
                 for (Address adr : addresses){
                     if (adr.getLocality() != null && adr.getLocality().length() > 0){
-                        cityName = adr.getLocality() +" country is " + adr.getCountryName();
+                        cityName = adr.getLocality() +", " + adr.getCountryName();
                         break;
                     }
                 }
@@ -133,11 +134,13 @@ public class DataClass {
     // <<location>> // |-
         public static String getTimeStamp (){
             Calendar calendar = Calendar.getInstance();
-            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-mm-yyyy HH:mm:ss z");
+            SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd-MM-yyyy HH:mm:ss z");
             String currentDate = simpleDateFormat.format(calendar.getTime());
         return currentDate;
         }
-
+        public static String getHeaderOne(Context context){
+        return context.getResources().getString(R.string.help_screen_one_header);
+        }
 
 //        public void getdetails(){
 //        String versionStr;

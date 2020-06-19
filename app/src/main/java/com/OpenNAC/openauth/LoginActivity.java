@@ -2,16 +2,19 @@ package com.OpenNAC.openauth;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.hardware.biometrics.BiometricPrompt;
 import android.hardware.fingerprint.FingerprintManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.CancellationSignal;
 import android.view.View;
-import android.webkit.URLUtil;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.RequiresApi;
@@ -26,6 +29,9 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
+
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 import okhttp3.Headers;
 import okhttp3.MultipartBody;
@@ -56,7 +62,7 @@ public class LoginActivity extends AppCompatActivity {
     protected static boolean loggedin,spanish;
     ///
     private FingerprintManager fingerprintManager; // This is used to initialise the fingerprint Manager
-
+    TextView biometric_text;
     /**
      * The following code is run when the page is created
      */
@@ -67,44 +73,57 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         //getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_login);
-        //result = findViewById(R.id.result);
         spanish = getIntent().getBooleanExtra("spanishset",false);
         edtUsername = findViewById(R.id.usernameBox);
         edtPassword = findViewById(R.id.passwordBox);
         urlBox = findViewById(R.id.URLBox);
         rememberMeBox = findViewById(R.id.rememberMeBox);
         btnLogin = findViewById(R.id.loginBtn);
-//        passTxt = findViewById(R.id.passTxt);
-//        WifiManager wifiManager = (WifiManager) getApplicationContext().getSystemService(WIFI_SERVICE);
-//        WifiInfo wifiInfo = wifiManager.getConnectionInfo();
-//        System.out.println( "ssid in login screen is " + DataClass.getSsid(wifiInfo) + "\n");
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPreferences.edit();
+        biometric_text = findViewById(R.id.biometric_text);
+        //pre-text setting
+        urlBox.setText("https://");
+        //fingerprint managing
+        Executor executor = Executors.newSingleThreadExecutor();
 
-//        if (spanish){
-//            urlBox.setHint("Ingrese la URL aquí");
-//            edtUsername.setHint("Ingrese su Nombre");
-//            passTxt.setText("Contraseña");
-//            edtPassword.setHint("Ingerese su contraseña");
-//            btnLogin.setText("Entrar");
-//            rememberMeBox.setText("Recuérdame");
-//        }
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
+        loggedin = sharedPreferences.getBoolean("logged",false);
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.P){
+            BiometricPrompt biometricPrompt = new BiometricPrompt.Builder(this)
+                    .setTitle(getString(R.string.waiting_for_auth))
+                    .setSubtitle("Biometric Authentication")
+                    .setDescription("")
+                    .setNegativeButton("Cancel", executor, new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
 
-        enableFingerprint();
+                        }
+                    }).build();
+            if(loggedin) {
+                biometricPrompt.authenticate(new CancellationSignal(), executor, new BiometricPrompt.AuthenticationCallback() {
+                    @Override
+                    public void onAuthenticationSucceeded(BiometricPrompt.AuthenticationResult result) {
+                        runOnUiThread(() -> setScreen());
+
+                    }
+                });
+            }
+        }
+        else{
+            enableFingerprint();
+        }
+
         btnLogin.setOnClickListener(v -> {
             url = urlBox.getText().toString();
             if (!urlBox.getText().toString().endsWith("/")) {
                 url = urlBox.getText().toString() + "/";
             }
-            editor.putString(URL_TEXT, EncryptionUtils.encrypt(LoginActivity.this,urlBox.getText().toString()));
-            editor.apply();
             String username = edtUsername.getText().toString();
             String password = edtPassword.getText().toString();
             try {
                 createPost(url, username, password, v);
-                //localUserSwitch.resetPivot();
             } catch (IllegalArgumentException ex) {
                 System.out.println("catch is wrong" + ex.getMessage());
+                Toast.makeText(LoginActivity.this,ex.getMessage(), Toast.LENGTH_LONG).show();
             }
         });
     }
@@ -123,7 +142,7 @@ public class LoginActivity extends AppCompatActivity {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
                 .build();
-        if (validateLogin(url, username, password)) {
+        if (validateLogin()) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
                     .addConverterFactory(GsonConverterFactory.create())
@@ -141,6 +160,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (!response.isSuccessful()) {
                         //result.setText("Code:" + response.code());
                         System.out.println("Code: " + response.code());
+                        Toast.makeText(LoginActivity.this,response.code(), Toast.LENGTH_LONG).show();
                         return;
                     }
 
@@ -157,7 +177,9 @@ public class LoginActivity extends AppCompatActivity {
                     SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
                     SharedPreferences.Editor editor = sharedPreferences.edit();
                     editor.putString("cookie", EncryptionUtils.encrypt(LoginActivity.this,cookie));
-
+                    editor.putString("username", EncryptionUtils.encrypt(LoginActivity.this,username));
+                    editor.putString("token", EncryptionUtils.encrypt(LoginActivity.this,postResponse.getToken()));
+                    editor.putString(URL_TEXT, EncryptionUtils.encrypt(LoginActivity.this,url));
                     editor.apply();
                     Intent myIntent = new Intent(view.getContext(), VerificationActivity.class);
                     myIntent.putExtra("baseURL",url);
@@ -182,41 +204,23 @@ public class LoginActivity extends AppCompatActivity {
 
     /**
      * This following method will make sure the fields below are not empty
-     *1
-     * @param url,
-     * @param password
-     * @param, username,
      */
-    private boolean validateLogin(String url, String username, String password) {
-        if (!URLUtil.isValidUrl(url)) {
-            Toast.makeText(this, "URL is not valid", Toast.LENGTH_SHORT).show();
+    private boolean validateLogin() {
+
+        if (urlBox.getText() == null || urlBox.getText().length() == 0) {
+            Toast.makeText(this, getString(R.string.url_invalid), Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (username == null || username.trim().length() == 0) {
-            Toast.makeText(this, "Username is required", Toast.LENGTH_SHORT).show();
+        else if (edtUsername.getText() == null || edtUsername.getText().length() == 0) {
+            Toast.makeText(this, getString(R.string.username_required), Toast.LENGTH_SHORT).show();
             return false;
         }
-        if (password == null || password.trim().length() == 0) {
-            Toast.makeText(this, "Password is required", Toast.LENGTH_SHORT).show();
+
+        if (edtPassword.getText() == null || edtPassword.getText().length() == 0) {
+            Toast.makeText(this, getString(R.string.password_required), Toast.LENGTH_SHORT).show();
             return false;
         }
         return true;
-    }
-
-
-    public void loadData() {
-        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, MODE_PRIVATE);
-        urlText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(URL_TEXT, ""));
-        usernameText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(USERNAME_TEXT, ""));
-        passwordText = EncryptionUtils.decrypt(LoginActivity.this, sharedPreferences.getString(PASSWORD_TEXT, ""));
-        switchOnOff = sharedPreferences.getBoolean(SWITCH1, false);
-    }
-
-    public void updateViews() {
-        urlBox.setText(urlText);
-        edtUsername.setText(usernameText);
-        edtPassword.setText(passwordText);
-        System.out.println("update data is: " + usernameText);
     }
 
     @RequiresApi(api = Build.VERSION_CODES.M)
@@ -230,7 +234,6 @@ public class LoginActivity extends AppCompatActivity {
                         SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS,MODE_PRIVATE);
                         loggedin = sharedPreferences.getBoolean("logged",false);
                         if(loggedin) {
-
                                 setStatus(getString(R.string.waiting_for_auth));
                             auth();
                         }
@@ -242,10 +245,8 @@ public class LoginActivity extends AppCompatActivity {
 
                     @Override
                     public void onPermissionDenied(PermissionDeniedResponse response) {
+                            setStatus(getString(R.string.need_permission));
 
-                            setStatus("Necesita permiso");
-
-                            setStatus("Need permission");
 
                     }
 
@@ -278,21 +279,21 @@ public class LoginActivity extends AppCompatActivity {
                     @Override
                     public void onAuthenticationSucceeded(FingerprintManager.AuthenticationResult result) {
                         super.onAuthenticationSucceeded(result);
-                        setStatus("Success !");
+                        setStatus(getString(R.string.success));
                         runOnUiThread(() -> setScreen());
                     }
 
                     @Override
                     public void onAuthenticationFailed() {
                         super.onAuthenticationFailed();
-                        setStatus("not recognized");
+                        setStatus(getString(R.string.not_recognized));
                     }
                 }, null);
             } else {
-                setStatus("No fingerprint saved");
+                setStatus(getString(R.string.no_fingerprint));
             }
         } else {
-            setStatus("No fingerprint reader detected");
+            setStatus(getString(R.string.no_finger_reader));
         }
     }
 
@@ -301,8 +302,9 @@ public class LoginActivity extends AppCompatActivity {
         startActivity(intent);
         finish();
     }
+
     private void setStatus(final String message) {
-        runOnUiThread(() -> System.out.println(message));
+        runOnUiThread(() -> biometric_text.setText(message));
     }
 
 }
