@@ -27,6 +27,7 @@ import androidx.core.view.GravityCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.OpenNAC.openauth.Services.ConfigurationParams;
 import com.OpenNAC.openauth.Services.RssReader;
 import com.OpenNAC.openauth.Services.User;
 import com.OpenNAC.openauth.Services.UserService;
@@ -367,15 +368,17 @@ public class OTPActivity extends AppCompatActivity implements NavigationView.OnN
                     }
                     //initialising the user class to get response body and get the various values needed
                     User postResponse = response.body();
-                    String rssFeed = postResponse.getValue();
-                    address = rssFeed.replaceAll("rssUrl=feed","http");
+                    ConfigurationParams params = postResponse.getParams();
+                    String paramsfound = params.getRssUrl();
+                    System.out.println("rssUrl of config params is: " + params.getRssUrl());
+                    address = paramsfound.replaceAll("feed:","http:");
                     System.out.println("response value is: " + address);
-                    if(address!=null) {
-                        RssReader rssReader = new RssReader(OTPActivity.this, recyclerView, address);
-                        rssReader.execute();
+                    if(address==null || address.length() == 0) {
+                        Toast.makeText(OTPActivity.this,"Server Bad Response",Toast.LENGTH_SHORT).show();
                     }
                     else{
-                        Toast.makeText(OTPActivity.this,"Server Bad Response",Toast.LENGTH_SHORT).show();
+                        RssReader rssReader = new RssReader(OTPActivity.this, recyclerView, address);
+                        rssReader.execute();
                     }
 
                 }

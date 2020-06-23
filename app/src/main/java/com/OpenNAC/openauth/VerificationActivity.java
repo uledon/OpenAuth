@@ -194,6 +194,7 @@ public class VerificationActivity extends AppCompatActivity {
                     return;
 
                 }
+                Toast.makeText(VerificationActivity.this,getString(R.string.success), Toast.LENGTH_SHORT).show();
                 User postResponse = response.body();
 
                 editor.putString("account", EncryptionUtils.encrypt(VerificationActivity.this,postResponse.getAccount()));
@@ -203,6 +204,9 @@ public class VerificationActivity extends AppCompatActivity {
                 System.out.println(postResponse.getDeviceId());
                 if(getIntent().getBooleanExtra("logged", false)) {
                     editor.putBoolean("logged", true);
+                }
+                else{
+                    editor.putBoolean("logged", false);
                 }
                 editor.apply();
                 if (postResponse.getSecret()== null){

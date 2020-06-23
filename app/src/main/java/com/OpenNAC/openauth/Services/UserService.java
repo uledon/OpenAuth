@@ -14,7 +14,7 @@ public interface UserService {
 
 //   @POST("mobileauth")
 //   Call<Post>createPost(@Body Post post);
-
+   //@Headers("Content-Type: application/json")
    @Multipart
    @POST("mobileauth")
    Call<Post> createPost(

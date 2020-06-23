@@ -17,6 +17,7 @@ public class User {
     private String deviceId;
     private String challengeId;
     private String value;
+    private ConfigurationParams params;
     public User(String mac, String factor, String fcmt, String vendor, String os, String version) {
         this.factor = factor;
         this.mac = mac;
@@ -30,6 +31,9 @@ public class User {
     }
     public String getValue(){
         return value;
+    }
+    public ConfigurationParams getParams(){
+        return params;
     }
     public String getAccount(){
         return account;

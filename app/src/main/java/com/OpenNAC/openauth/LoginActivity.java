@@ -142,6 +142,9 @@ public class LoginActivity extends AppCompatActivity {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .addInterceptor(loggingInterceptor)
                 .build();
+//        Gson gson = new GsonBuilder()
+//                .setLenient()
+//                .create();
         if (validateLogin()) {
             Retrofit retrofit = new Retrofit.Builder()
                     .baseUrl(url)
@@ -163,7 +166,7 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this,response.code(), Toast.LENGTH_LONG).show();
                         return;
                     }
-
+                    Toast.makeText(LoginActivity.this,getString(R.string.success), Toast.LENGTH_LONG).show();
                     Post postResponse = response.body();
                     Headers headers = response.headers();
                     String cookie = response.headers().get("Set-Cookie");
@@ -187,7 +190,10 @@ public class LoginActivity extends AppCompatActivity {
                     myIntent.putExtra("token", postResponse.getToken());
                     myIntent.putExtra("spanishset",spanish);
                     if (rememberMeBox.isChecked()) {
-                    myIntent.putExtra("logged",true);
+                        myIntent.putExtra("logged",true);
+                    }
+                    else{
+                        myIntent.putExtra("logged",false);
                     }
                     startActivityForResult(myIntent, 0);
                     finish();
